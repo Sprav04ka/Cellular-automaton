@@ -18,7 +18,7 @@ FIELD_HEIGHT = SCREEN_HEIGHT // CELL_SIZE
 # Интервал (период), через который будет происходить вычисление следующего поколения клеткок. В секундах
 # Скорость регулируется колесом мыши. Раз в 2 секунды - медленно, раз в 0.1 секунду - быстро
 GAME_SPEED_MIN = 2.0
-GAME_SPEED_MAX = 0.1
+GAME_SPEED_MAX = 0.05
 
 # Изменение скорости за 1 событие прокрутки колеса мышки
 GAME_SPEED_INCREMENT_DECREMENT = 0.05
@@ -40,7 +40,6 @@ def generation(cells: list, surface: pygame.Surface) -> None:
             alive_cells_counter = 0
             for x_zone_x in range(x - 1, x + 2):
                 for y_zone_y in range(y - 1, y + 2):
-
                     x_zone_x_fixed = x_zone_x
                     y_zone_y_fixed = y_zone_y
                     if x_zone_x_fixed >= FIELD_WIDTH:
@@ -49,7 +48,6 @@ def generation(cells: list, surface: pygame.Surface) -> None:
                     elif x_zone_x_fixed < 0:
                         # 64 + (-1) = 63
                         x_zone_x_fixed = FIELD_WIDTH + x_zone_x_fixed
-
                     if y_zone_y_fixed >= FIELD_HEIGHT:
                         # 64 - 64 = 0
                         y_zone_y_fixed = FIELD_HEIGHT - y_zone_y_fixed
@@ -63,7 +61,6 @@ def generation(cells: list, surface: pygame.Surface) -> None:
                 if alive_cells_counter > 3 or alive_cells_counter < 2:
                     # cell_modify(cells, surface, x, y, False)
                     cells_to_delete.append([x, y])
-
             elif alive_cells_counter == 3:
                 # cell_modify(cells, surface, x, y, True)
                 cells_to_create.append([x, y])
@@ -93,7 +90,6 @@ def cell_modify(cells: list, surface: pygame.Surface, x: float or int, y: float 
 
         # Добавление клетки в список
         cells.append([x, y])
-        print("Создаем")
 
     # Удаление клетки
     else:
@@ -104,7 +100,6 @@ def cell_modify(cells: list, surface: pygame.Surface, x: float or int, y: float 
         pygame.draw.rect(surface, BACKGROUND_COLOR, pygame.Rect(
             x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
         pygame.display.flip()
-        print("Удаляем")
 
 
 def main() -> None:
@@ -116,7 +111,7 @@ def main() -> None:
 
     # Инициализация и создание окна
     surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("Игра жизни")
+    pygame.display.set_caption("Life")
 
     # Заполнение фона
     surface.fill(BACKGROUND_COLOR)
@@ -147,7 +142,6 @@ def main() -> None:
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 # Получаем координаты нажатия
                 x, y = event.pos
-
                 # Выравниваем по сетке
                 # Например у нас X это 11.5 а размер сетки 10. Тогда 11.5 // 10 даст 1 (// это целочисленое деление)
                 x = x // CELL_SIZE
@@ -157,7 +151,6 @@ def main() -> None:
                 if [x, y] in cells:
                     # Удаляем
                     cell_modify(cells, surface, x, y, False)
-
                 # Клетки нет
                 else:
                     # Создаём
@@ -171,7 +164,6 @@ def main() -> None:
                         game_speed -= GAME_SPEED_INCREMENT_DECREMENT
                     else:
                         print("Скорость и так уже слишком высокая")
-
                 # Движение колёсика вниз
                 elif event.y < 0:
                     # Проверка, можно ли увеличить интервал еще больше (уменьшить скорость)
@@ -184,14 +176,12 @@ def main() -> None:
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 if space_to_pause == False:
                     space_to_pause = True
-                    print("Включена пауза")
                 else:
                     space_to_pause = False
-                    print("Пауза выключена")
 
             # Событие выхода -> завершаем всё и выходим из всего
             elif event.type == pygame.QUIT:
-                print("Выход")
+
                 pygame.quit()
                 sys.exit()
 
@@ -200,7 +190,6 @@ def main() -> None:
         if not space_to_pause and time.time() - generation_time_last >= game_speed:
             # Запоминаем время для следующего цикла
             generation_time_last = time.time()
-
             # Вызываем функцию обновления клеток
             generation(cells, surface)
 
