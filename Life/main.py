@@ -9,9 +9,11 @@ CELL_COLOR = (255, 255, 255)
 # Шиина и высота экрана
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
-
 # Размер клетки и сетки
 CELL_SIZE = 10
+
+FIELD_WIDTH = SCREEN_WIDTH // CELL_SIZE
+FIELD_HEIGHT = SCREEN_HEIGHT // CELL_SIZE
 
 # Интервал (период), через который будет происходить вычисление следующего поколения клеткок. В секундах
 # Скорость регулируется колесом мыши. Раз в 2 секунды - медленно, раз в 0.1 секунду - быстро
@@ -31,17 +33,32 @@ def generation(cells: list, surface: pygame.Surface) -> None:
     cells_to_delete = []
     cells_to_create = []
     # Пробегаем всё поле по X
-    for x in range(SCREEN_WIDTH // CELL_SIZE):
+    for x in range(FIELD_WIDTH):
         # Пробегаем всё поле по Y
-        for y in range(SCREEN_HEIGHT // CELL_SIZE):
+        for y in range(FIELD_HEIGHT):
             # Считаем живые клетки
             alive_cells_counter = 0
             for x_zone_x in range(x - 1, x + 2):
                 for y_zone_y in range(y - 1, y + 2):
-                    if x_zone_x != x or y_zone_y != y:
-                        if [x_zone_x, y_zone_y] in cells:
-                            alive_cells_counter += 1
 
+                    x_zone_x_fixed = x_zone_x
+                    y_zone_y_fixed = y_zone_y
+                    if x_zone_x_fixed >= FIELD_WIDTH:
+                        # 64 - 64 = 0
+                        x_zone_x_fixed = FIELD_WIDTH - x_zone_x_fixed
+                    elif x_zone_x_fixed < 0:
+                        # 64 + (-1) = 63
+                        x_zone_x_fixed = FIELD_WIDTH + x_zone_x_fixed
+
+                    if y_zone_y_fixed >= FIELD_HEIGHT:
+                        # 64 - 64 = 0
+                        y_zone_y_fixed = FIELD_HEIGHT - y_zone_y_fixed
+                    elif y_zone_y_fixed < 0:
+                        # 64 + (-1) = 63
+                        y_zone_y_fixed = FIELD_HEIGHT + y_zone_y_fixed
+                    if x_zone_x_fixed != x or y_zone_y_fixed != y:
+                        if [x_zone_x_fixed, y_zone_y_fixed] in cells:
+                            alive_cells_counter += 1
             if [x, y] in cells:
                 if alive_cells_counter > 3 or alive_cells_counter < 2:
                     # cell_modify(cells, surface, x, y, False)
